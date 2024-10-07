@@ -1,0 +1,76 @@
+import React from 'react';
+import {
+  Dimensions,
+  Text,
+  View,
+  Image,
+  Platform,
+} from 'react-native';
+import Logo from '@/assets/images/reactLogo.png';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import Button from '@/lib/ui/components/button';
+
+const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
+
+function welcomeScreen() {
+  const text = useThemeColor({}, 'text');
+  const gray800 = useThemeColor({}, 'gray800');
+
+  const createAccountRoute = () => {
+    router.push('(screens)/onboarding/phoneNumberScreen');
+  };
+
+  const loginRoute = () => {
+    router.push('(screens)/login/loginScreen');
+  };
+
+  return (
+    <SafeAreaView
+      className={`flex-1 pt-${Platform.OS === 'android' ? '4' : '0'}`}
+    >
+      <View className='flex-1 justify-center items-center p-6'>
+        <Image source={Logo} />
+        <Text
+          className={`text-2xl font-bold text-center mt-6`}
+          style={[{}, { color: text }]}
+        >
+          Welcome to E-Bills
+        </Text>
+        <Text
+          className={`text-lg text-center mx-5 my-4 leading-7`}
+          style={[{}, { color: text }]}
+        >
+          E-Bills is your go-to solution for simplified bill payments. Create an
+          account or sign in to this innovative platform.
+        </Text>
+        <View className='w-full mt-4'>
+          <Button
+            bgColor={gray800}
+            route={createAccountRoute}
+            btnText='Create an account'
+          />
+        </View>
+        <View className='w-full m-4'>
+          <Button
+            // bgColor={gray800}
+            route={loginRoute}
+            btnText='Login'
+          />
+        </View>
+        <Text
+          className={`text-base text-center mx-5`}
+          style={[{}, { color: text }]}
+        >
+          By clicking on{' '}
+          <Text className='text-green-500'>"Create an account"</Text> or{' '}
+          <Text className='text-green-500'>"Login",</Text> you have agreed to
+          our terms and conditions.
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+export default welcomeScreen;
