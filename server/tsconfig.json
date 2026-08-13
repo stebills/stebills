@@ -120,8 +120,7 @@
     "rootDir": "./src"
   },
   "include": [
-    "src/**/*.ts",
-    "custom.d.ts"
+    "src/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

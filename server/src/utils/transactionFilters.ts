@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { TransactionType, TransactionStatus } from '../models/transactionModel';
+import { TransactionType, TransactionStatus } from '../models/transaction.model';
 
 const buildFilters = (filters: any, user: string) => {
   const query: any = {

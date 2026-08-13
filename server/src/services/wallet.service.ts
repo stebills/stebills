@@ -1,7 +1,5 @@
-import { ObjectId } from 'mongoose';
 import { generateAccountNumber } from '../utils/accountNumberGen';
-import { Wallets } from '../models/wallet.model';
-import TransactionService from './transaction.service';
+import Wallets from '../models/wallet.model';
 import { log } from 'console';
 import ReferralService from './referral.service';
 
@@ -38,11 +36,11 @@ class WalletService {
   static async createWallet(user: string, firstName: string, lastName: string) {
     try {
       const walletName = ` ${firstName} ${lastName}`;
-      const billPointAccountNum = generateAccountNumber();
-      let walletData = {
+      const stebillsAccountNum = generateAccountNumber();
+      const walletData = {
         user,
         walletName,
-        billPointAccountNum,
+        stebillsAccountNum,
       };
 
       const newWallet = await Wallets.create(walletData);

@@ -2,7 +2,6 @@ import {
   View,
   Text,
   Platform,
-  Image,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -10,22 +9,21 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Logo from '@/assets/images/reactLogo.png';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ArrowLeft2 } from 'iconsax-react-native';
 import Nigeria from '@/assets/svg/nigeria.svg';
 import Button from '@/lib/ui/components/button';
+import Logo from '@/lib/ui/components/logo';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 
-const phoneNumberScreen = () => {
+const PhoneNumberScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberIsFocused, setPhoneNumberIsFocused] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
   const text = useThemeColor({}, 'text');
   const green500 = useThemeColor({}, 'green500');
-  const gray300 = useThemeColor({}, 'gray300');
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -55,23 +53,14 @@ const phoneNumberScreen = () => {
         <View className='flex-1'>
           <View className=''>
             <View className='flex flex-row justify-center items-center mb-8 mt-8'>
-              <Image
-                source={Logo}
-                className='w-6 h-6'
-              />
-              <Text
-                style={[{}, { color: text }]}
-                className='text-2xl'
-              >
-                -Bills
-              </Text>
+              <Logo size={28} />
             </View>
             <View>
               <Text
                 style={[{}, { color: text }]}
                 className='text-2xl text-left'
               >
-                Get an E-Bills account
+                Get a stebills account
               </Text>
               <Text
                 style={[{}, { color: text }]}
@@ -149,7 +138,7 @@ const phoneNumberScreen = () => {
             </Text>
           </View>
           <View className='absolute bottom-10 left-0 right-0 items-center'>
-            <Text style={{ color: text }}>Already have an E-Bills Account</Text>
+            <Text style={{ color: text }}>Already have a stebills account</Text>
             <TouchableOpacity>
               <Text className='text-green-500'>Click here to Log in </Text>
             </TouchableOpacity>
@@ -159,4 +148,4 @@ const phoneNumberScreen = () => {
     </TouchableWithoutFeedback>
   );
 };
-export default phoneNumberScreen;
+export default PhoneNumberScreen;

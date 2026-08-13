@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, Slot, Href, useRouter, useSegments } from 'expo-router';
+import { Stack, Href, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
@@ -59,7 +59,7 @@ export default function RootLayout() {
     if (initialRoute && isReady && loaded) {
       router.replace(initialRoute as Href);
     }
-  }, [initialRoute, isReady, loaded]);
+  }, [initialRoute, isReady, loaded, router]);
 
   useEffect(() => {
     if (loaded && isReady) {

@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { log } from 'console';
-import { Request, Response } from 'express';
 
 class VtPassHelpers {
   static apiUrl = 'https://sandbox.vtpass.com/api'; // Use 'https://api-service.vtpass.com/api' for live
@@ -43,31 +41,27 @@ class VtPassHelpers {
   }
 
   static async getVariationCodes(serviceID: string) {
-    try {
-      const url = `${process.env.VTPASS_GET_VARIATION_CODES}?serviceID=${serviceID}`;
+    const url = `${process.env.VTPASS_GET_VARIATION_CODES}?serviceID=${serviceID}`;
 
-      const basicAuth = Buffer.from(
-        `${this.apiKey}:${this.publicKey}`
-      ).toString('base64');
+    const basicAuth = Buffer.from(
+      `${this.apiKey}:${this.publicKey}`
+    ).toString('base64');
 
-      const response = await axios.get(url, {
-        headers: { authorization: `Basic ${basicAuth}` },
-      });
-      const options = response.data;
+    const response = await axios.get(url, {
+      headers: { authorization: `Basic ${basicAuth}` },
+    });
+    const options = response.data;
 
-      const modifiedOptions = options.content.varations.map((option: any) => {
-        return {
-          variationCode: option.variation_code,
-          name: option.name,
-          variationAmount: option.variation_amount,
-          image: option.image,
-        };
-      });
+    const modifiedOptions = options.content.varations.map((option: any) => {
+      return {
+        variationCode: option.variation_code,
+        name: option.name,
+        variationAmount: option.variation_amount,
+        image: option.image,
+      };
+    });
 
-      return modifiedOptions;
-    } catch (error: any) {
-      throw error;
-    }
+    return modifiedOptions;
   }
 
   static async queryTransactionStatus(requestId: any) {

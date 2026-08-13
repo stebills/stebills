@@ -23,7 +23,7 @@ const SetupTransactionPinScreen = () => {
   const [phoneNumberIsFocused, setPhoneNumberIsFocused] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const inputRefs = useRef<Array<TextInput | null>>([]);
+  const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const text = useThemeColor({}, 'text');
   const green500 = useThemeColor({}, 'green500');

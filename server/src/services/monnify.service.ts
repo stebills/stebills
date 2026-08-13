@@ -1,7 +1,8 @@
 import axios from 'axios';
+import crypto from 'crypto';
 import { log } from 'console';
 import { IUser } from '../models/user.model';
-const crypto = require('crypto');
+import { logAxiosError } from '../utils/axiosError';
 
 interface initiateTransferArgs {
   amount: number;
@@ -54,7 +55,7 @@ const generateReference = async () => {
   const cleanedId = uniqueID.replace(/[^a-zA-Z0-9]/g, '');
 
   // Add a custom preffix
-  const reference = 'Bilpoint' + cleanedId;
+  const reference = 'stebills' + cleanedId;
 
   return reference;
 };
@@ -68,8 +69,8 @@ class MonnifyService {
       // Extract the first three letters from the user's firstName
       const firstThreeLetters = firstName.substring(0, 3);
 
-      // Concatenate "BillPoint-" with the first three letters
-      const accountName = `BillPoint-${firstThreeLetters}`;
+      // Concatenate "stebills-" with the first three letters
+      const accountName = `stebills-${firstThreeLetters}`;
 
       const payload = {
         accountReference: user._id,
@@ -96,32 +97,13 @@ class MonnifyService {
       if (response.status === 200) {
         // Account created successfully.
         console.log(`Account created successfully, ${accountName}`);
-
-        const accountDetails = response.data.responseBody.accounts;
-        const accountNumbers = response.data.responseBody.accounts.map(
-          (account: any) => account.accountNumber
-        );
-
-        let walletUpdateDate = {
-          walletName: accountDetails.accountName,
-          user: user._id,
-          monnifyAccountNum: accountNumbers,
-        };
       } else {
         // Handle errors or failed responses.
         console.error('message response:' + response.data);
       }
     } catch (error: any) {
-      // Handle error response
-      if (error.response) {
-        console.error('Server responded with:', error.response.status);
-        console.error('Response data:', error.response.data);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error('No response received:', error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Request setup error:', error.message);
+      logAxiosError('MonnifyService.createReserveAccount', error);
+      if (!error.response && !error.request) {
         throw new Error(error.message);
       }
     }
@@ -133,7 +115,7 @@ class MonnifyService {
       const accountReference = userId;
       const accessToken = await getAccessToken();
 
-      let path = `${API_URL}/${accountReference}`;
+      const path = `${API_URL}/${accountReference}`;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
@@ -196,31 +178,7 @@ class MonnifyService {
 
       return response.data;
     } catch (error: any) {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error('Error response data:', error.response.data);
-        console.error('Error response status:', error.response.status);
-        console.error('Error response headers:', error.response.headers);
-
-        if (error.response.status === 404) {
-          // Handle 404 error specifically
-          console.error(
-            'Resource not found:',
-            error.response.data.responseMessage
-          );
-        } else {
-          // Handle other HTTP errors
-          console.error('An error occurred:', error.message);
-        }
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error('No response received:', error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Error setting up request:', error.message);
-      }
-
+      logAxiosError('MonnifyService.initiateTransfer', error);
       throw new Error(error);
     }
   }
@@ -229,7 +187,7 @@ class MonnifyService {
     const accessToken = await getAccessToken();
     const API_URL = process.env.MONNIFY_GET_TRANSFER_STATUS;
 
-    let path = `${API_URL}?reference=${reference}`;
+    const path = `${API_URL}?reference=${reference}`;
 
     const headers = {
       'Content-Type': 'application/json',
@@ -250,7 +208,7 @@ class MonnifyService {
     const accessToken = await getAccessToken();
     const API_URL = process.env.MONNIFY_WALLET_BALANCE_URL;
 
-    let path = `${API_URL}?accountNumber=${walletAccountNumber}`;
+    const path = `${API_URL}?accountNumber=${walletAccountNumber}`;
 
     const headers = {
       'Content-Type': 'application/json',
@@ -271,10 +229,10 @@ class MonnifyService {
     const accessToken = await getAccessToken();
     const API_URL = process.env.MONNIFY_GET_ALL_TRANSFER;
 
-    let pageSizee = pageSize || 5;
-    let pageNoo = pageNo || 1;
+    const pageSizee = pageSize || 5;
+    const pageNoo = pageNo || 1;
 
-    let path = `${API_URL}?pageSize=${pageSizee}&pageNo=${pageNoo}`;
+    const path = `${API_URL}?pageSize=${pageSizee}&pageNo=${pageNoo}`;
 
     const headers = {
       'Content-Type': 'application/json',
@@ -299,6 +257,7 @@ class MonnifyService {
         method: 'get',
         url: process.env.MONNIFY_GET_ALL_BANKS,
         headers: {
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       };
@@ -339,31 +298,7 @@ class MonnifyService {
 
       return response.data;
     } catch (error: any) {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error('Error response data:', error.response.data);
-        console.error('Error response status:', error.response.status);
-        console.error('Error response headers:', error.response.headers);
-
-        if (error.response.status === 404) {
-          // Handle 404 error specifically
-          console.error(
-            'Resource not found:',
-            error.response.data.responseMessage
-          );
-        } else {
-          // Handle other HTTP errors
-          console.error('An error occurred:', error.message);
-        }
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error('No response received:', error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Error setting up request:', error.message);
-      }
-
+      logAxiosError('MonnifyService.authorizeTransfer', error);
       throw new Error(error);
     }
   }

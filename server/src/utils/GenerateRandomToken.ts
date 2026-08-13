@@ -1,17 +1,18 @@
 import User from "../models/user.model";
 import EmailSender from "../services/mail.service";
 
-export const generateRandomToken = async () => {
+const generateOTP = () => {
   const min = 1000;
   const max = 9999;
-  const OTP = Math.floor(min + Math.random() * (max - min + 1));
-  return OTP;
+  return Math.floor(min + Math.random() * (max - min + 1));
+};
+
+export const generateRandomToken = async () => {
+  return generateOTP();
 };
 
 export const generateAndSaveOTP = async (email: string) => {
-  const min = 1000;
-  const max = 9999;
-  const otp = Math.floor(min + Math.random() * (max - min + 1));
+  const otp = generateOTP();
   const otpCreationTime = new Date();
 
   await User.updateOne(

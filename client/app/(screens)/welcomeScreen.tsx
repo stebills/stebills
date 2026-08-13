@@ -1,20 +1,16 @@
 import React from 'react';
 import {
-  Dimensions,
   Text,
   View,
-  Image,
   Platform,
 } from 'react-native';
-import Logo from '@/assets/images/reactLogo.png';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import Button from '@/lib/ui/components/button';
+import Logo from '@/lib/ui/components/logo';
 
-const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
-
-function welcomeScreen() {
+function WelcomeScreen() {
   const text = useThemeColor({}, 'text');
   const gray800 = useThemeColor({}, 'gray800');
 
@@ -31,18 +27,18 @@ function welcomeScreen() {
       className={`flex-1 pt-${Platform.OS === 'android' ? '4' : '0'}`}
     >
       <View className='flex-1 justify-center items-center p-6'>
-        <Image source={Logo} />
+        <Logo size={64} />
         <Text
           className={`text-2xl font-bold text-center mt-6`}
           style={[{}, { color: text }]}
         >
-          Welcome to E-Bills
+          Welcome to stebills
         </Text>
         <Text
           className={`text-lg text-center mx-5 my-4 leading-7`}
           style={[{}, { color: text }]}
         >
-          E-Bills is your go-to solution for simplified bill payments. Create an
+          stebills is your go-to solution for simplified bill payments. Create an
           account or sign in to this innovative platform.
         </Text>
         <View className='w-full mt-4'>
@@ -73,4 +69,4 @@ function welcomeScreen() {
   );
 }
 
-export default welcomeScreen;
+export default WelcomeScreen;

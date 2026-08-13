@@ -5,7 +5,7 @@ export interface IWallet extends Document {
   _id: string;
   walletName: string;
   balance: number;
-  billPointAccountNum: string;
+  stebillsAccountNum: string;
   monnifyAccountNum: string[];
   user: Types.ObjectId | IUser;
 }
@@ -13,7 +13,7 @@ export interface IWallet extends Document {
 const WalletSchema: Schema = new Schema({
   walletName: { type: String, required: true },
   balance: { type: Number, default: 0, required: true },
-  billPointAccountNum: { type: String },
+  stebillsAccountNum: { type: String },
   monnifyAccountNum: {
     type: [
       {

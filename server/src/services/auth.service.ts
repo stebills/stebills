@@ -1,6 +1,4 @@
 import UserService from '../services/user.service';
-import User from '../models/user.model';
-import { ObjectId } from 'mongodb';
 import { checkIfOtpIsExpired } from '../utils/checkIfOtpExpire';
 import { comparePin, hashPin } from '../utils/hashPin';
 
@@ -99,27 +97,6 @@ class AuthService {
     }
   }
 
-  // static async logout(email: string, verificationCode: string) {
-  //   try {
-  //     const signout = catchAsync(async (req, res) => {
-  //       //get the token from req header
-  //       const token = req.header("Authorization");
-  //       console.log(token);
-  //       if (!token) {
-  //         return res.status(400).json({ error: "No token provided" });
-  //       }
-
-  //       const tokenDoc = await UserToken.findOneAndUpdate(
-  //         { token: token },
-  //         { blacklisted: true }
-  //       );
-  //       console.log(tokenDoc);
-  //       res.json({ message: "Logout successfully😊" });
-  //     });
-  //   } catch (error: any) {
-  //     throw new Error(error)
-  //   }
-  // }
 }
 
 export default AuthService;

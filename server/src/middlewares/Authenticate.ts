@@ -1,9 +1,6 @@
 import JwtHelper from '../utils/JwtHelper';
 import { NextFunction, Request, Response } from 'express';
-// import { IUserRequest } from "../../../../Billpoint-server/src/interfaces";
 import { JwtPayload } from 'jsonwebtoken';
-import { ObjectId } from 'mongodb';
-import User from '../models/user.model';
 import UserService from '../services/user.service';
 
 const isAuth = async (

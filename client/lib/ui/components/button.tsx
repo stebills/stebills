@@ -1,4 +1,3 @@
-import SPACING from '@/constants/spacing';
 import React, { FC } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
@@ -24,7 +24,6 @@ interface OnboardingItemProps {
 
 const OnboardingItem: React.FC<OnboardingItemProps> = ({ item }) => {
   const { width } = useWindowDimensions();
-  const animation = useRef(null);
 
   const titleColor = useThemeColor({}, 'text');
   const descriptionColor = useThemeColor({}, 'description');

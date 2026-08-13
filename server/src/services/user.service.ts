@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
-import User, { IUser } from '../models/user.model';
+import User from '../models/user.model';
 import { ObjectId } from 'mongodb';
+import { USER_PRIVATE_FIELDS } from '../utils/constants';
 
 class UserService {
   static async checkThatUserExistWithPhoneNumber(number: number) {
@@ -32,18 +33,13 @@ class UserService {
 
   static async checkThatPasswordIsValid(email: string, password: string) {
     try {
-      let hashedPassword;
-
-      // const User = db.collection("users");
       const user = await User.findOne({ email }).lean().sort({ createdAt: -1 });
 
       if (!user || !user.password) {
         return false;
       }
 
-      hashedPassword = user.password;
-
-      const isMatch = await bcrypt.compare(password, hashedPassword);
+      const isMatch = await bcrypt.compare(password, user.password);
 
       return isMatch;
     } catch (error: any) {
@@ -70,7 +66,7 @@ class UserService {
         .lean()
         .sort({ createdAt: -1 })
         .populate({ path: 'wallet', select: 'balance _id' })
-        .select('-password -verificationOTP -transactionPin');
+        .select(USER_PRIVATE_FIELDS);
       return users;
     } catch (error: any) {
       console.error(error);
@@ -84,7 +80,7 @@ class UserService {
         .populate({ path: 'wallet', select: 'balance _id' })
         .lean()
         .sort({ createdAt: -1 })
-        .select('-password -verificationOTP -transactionPin');
+        .select(USER_PRIVATE_FIELDS);
       return users;
     } catch (error: any) {
       throw new Error(error);
@@ -97,7 +93,7 @@ class UserService {
         .populate({ path: 'wallet', select: 'balance _id' })
         .lean()
         .sort({ createdAt: -1 })
-        .select('-password -verificationOTP -transactionPin');
+        .select(USER_PRIVATE_FIELDS);
       return agents;
     } catch (error: any) {
       throw new Error(error);
@@ -125,7 +121,7 @@ class UserService {
     try {
       const users = User.findOne({ _id: new ObjectId(id) })
         .lean()
-        .select('-password -verificationOTP -transactionPin');
+        .select(USER_PRIVATE_FIELDS);
       return users;
     } catch (error: any) {
       console.error(error);
@@ -144,7 +140,7 @@ class UserService {
       if (!users) throw new Error('No users found🥲');
 
       const updatedUser = await User.findOne({ _id: new ObjectId(id) }).select(
-        '-password -verificationOTP -transactionPin'
+        USER_PRIVATE_FIELDS
       );
       return updatedUser;
     } catch (error: any) {
@@ -161,7 +157,7 @@ class UserService {
       if (!users) throw new Error('No users found🥲');
 
       const updatedUser = await User.findOne({ email }).select(
-        '-password -verificationOTP -transactionPin'
+        USER_PRIVATE_FIELDS
       );
 
       return updatedUser;

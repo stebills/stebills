@@ -1,17 +1,17 @@
-import { BankDetails, IBankDetails } from '../models/bankDetails.model';
-import Transactions from '../models/transactionModel';
+import BankDetails, { IBankDetails } from '../models/bankDetails.model';
+import Transactions from '../models/transaction.model';
 import { IUser } from '../models/user.model';
-import { IWallet, Wallets } from '../models/wallet.model';
+import Wallets, { IWallet } from '../models/wallet.model';
 import PaystackService from './paystack.service';
 import MonnifyService from './monnify.service';
-import WalletService, { updateWallet } from './wallet.service';
+import { updateWallet } from './wallet.service';
 
 class TransactionService {
   static async createTransaction(data: object) {
     await Transactions.create(data);
   }
 
-  // Sending money to a billspoint account
+  // Sending money to a stebills account
   static async sendMoney(
     senderId: string,
     walletNumber: number,
@@ -19,7 +19,7 @@ class TransactionService {
   ) {
     const senderWallet = await Wallets.findOne({ user: senderId });
     const receiverWallet = await Wallets.findOne({
-      billPointAccountNum: walletNumber,
+      stebillsAccountNum: walletNumber,
     }).populate({
       path: 'user',
       select: '_id',
@@ -48,42 +48,6 @@ class TransactionService {
     return response.data;
   }
 
-  // Paystack
-  // static async withdrawWalletBalance(
-  //   userId: string,
-  //   amount: number,
-  //   reason: string,
-  //   recipient: string
-  // ) {
-  //   const userWallet = await Wallets.findOne({ user: userId });
-  //   const userBank = await BankDetails.findOne({ user: userId });
-  //   if (!userWallet) {
-  //     throw new Error("User wallet not found");
-  //   }
-
-  //   if (!userBank) {
-  //     throw new Error("add bank account");
-  //   }
-
-  //   if (userWallet.balance < amount) {
-  //     throw new Error("insufficient balance");
-  //   }
-
-  //   const withdrawal = await PaystackService.makePayment(
-  //     amount,
-  //     reason,
-  //     recipient
-  //   );
-
-  //   if (withdrawal) {
-  //     // update sender wallet balance
-  //     await updateWallet(userId, amount, "EXPENSE");
-
-  //     return withdrawal;
-  //   }
-  // }
-
-  // Monnify
   static async withdrawWalletBalance(
     userId: string,
     amount: number,

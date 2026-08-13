@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, TouchableOpacity, Image } from 'react-native';
+import { View, Text, Modal, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import Bio from '@/assets/svg/bio.svg';
 import { useThemeColor } from '@/hooks/useThemeColor';

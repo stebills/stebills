@@ -15,19 +15,18 @@ import { ArrowLeft2 } from 'iconsax-react-native';
 import OTP from '@/assets/images/otp2.jpeg';
 import { router, useGlobalSearchParams } from 'expo-router';
 
-const verifyPhoneNumber = () => {
+const VerifyPhoneNumber = () => {
   const { phoneNumber } = useGlobalSearchParams();
   console.log(phoneNumber);
 
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [phoneNumberIsFocused, setPhoneNumberIsFocused] = useState(false);
-  const [resendTimer, setResendTimer] = useState(60);
+  const [resendTimer] = useState(60);
 
-  const inputRefs = useRef<Array<TextInput | null>>([]);
+  const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const text = useThemeColor({}, 'text');
   const green500 = useThemeColor({}, 'green500');
-  const gray300 = useThemeColor({}, 'gray300');
 
   // Function to update individual code boxes and auto-focus next
   const handleCodeChange = (value: string, index: any) => {
@@ -162,4 +161,4 @@ const verifyPhoneNumber = () => {
     </TouchableWithoutFeedback>
   );
 };
-export default verifyPhoneNumber;
+export default VerifyPhoneNumber;

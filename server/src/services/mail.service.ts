@@ -9,7 +9,7 @@ class EmailSender implements IEmailSender {
 
   SENDER_EMAIL: string;
 
-  MAIL_FROM_NAME = 'Billpoint';
+  MAIL_FROM_NAME = 'stebills';
 
   constructor(SENDER_EMAIL: any, SENDER_PASSWORD: any) {
     const AUTH = {

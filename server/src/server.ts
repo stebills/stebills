@@ -8,6 +8,8 @@ import morgan from 'morgan';
 import { notFound, errorHandler } from './middlewares/error';
 import db from './config/db';
 import authRoute from './routers/auth.router';
+import userRoute from './routers/user.router';
+import profileRoute from './routers/profile.router';
 import uploadRoute from './routers/upload.router';
 
 db();
@@ -24,20 +26,23 @@ app.use(express.json());
 
 app.use('/api', uploadRoute);
 app.use('/api', authRoute);
+app.use('/api', userRoute);
+app.use('/api', profileRoute);
 
-// const __dirname = path.resolve();
-app.use('./api/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname, '/uploads')));
+
+const PORT = process.env.PORT || 5000;
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
+  app.use(express.static(path.join(__dirname, '../client/dist')));
 
   app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
+    res.sendFile(path.resolve(__dirname, '../client/dist', 'index.html'))
   );
 } else {
   app.get('/', (req, res) => {
     res.status(200).json({
-      status: `Server running ${process.env.NODE_ENV} mode on post ${PORT}`,
+      status: `Server running ${process.env.NODE_ENV} mode on port ${PORT}`,
     });
   });
 }
@@ -46,9 +51,7 @@ app.use(notFound);
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-
 app.listen(
   PORT, () =>
-  console.log(colors.yellow.bold(`Server running ${process.env.NODE_ENV} mode on post ${PORT}`))
+  console.log(colors.yellow.bold(`Server running ${process.env.NODE_ENV} mode on port ${PORT}`))
 );

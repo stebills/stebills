@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import path from 'path'
-// const __dirname = path.resolve()
 
 export const postUpload = async (req: Request, res: Response) => {
   // check if there is no files
@@ -8,7 +7,7 @@ export const postUpload = async (req: Request, res: Response) => {
     return res.status(400).json({ msg: 'No files were uploaded.' })
 
   // check if files are in array format and return if not make it array
-  let files = Array.isArray(req.files.file) ? req.files.file : [req.files.file]
+  const files = Array.isArray(req.files.file) ? req.files.file : [req.files.file]
 
   // allowed image extensions
   const allowedImageExtensions = ['jpg', 'jpeg', 'png', 'gif']
@@ -53,7 +52,7 @@ export const postUpload = async (req: Request, res: Response) => {
     })
 
   // upload files passed the conditions
-  let filePaths: any[] = []
+  const filePaths: any[] = []
   files.forEach((file) => {
     const fileExtension = path.extname(file.name)
     const baseName = path.basename(file.name, `${fileExtension}`)

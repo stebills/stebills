@@ -1,7 +1,7 @@
 // import crypto from 'crypto';
 import mongoose, { Schema } from 'mongoose';
 import { IWallet } from './wallet.model';
-import { IReferral } from './referralModel';
+import { IReferral } from './referral.model';
 
 export interface IUser extends Document {
   _id: string;

@@ -5,7 +5,7 @@ export interface IProfile extends Document {
   _id: string;
   name: string;
   address: string;
-  phone: String;
+  phone: string;
   user: IUser
 }
 

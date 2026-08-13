@@ -2,7 +2,6 @@ import {
   View,
   Text,
   Platform,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
@@ -10,40 +9,26 @@ import {
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { ArrowLeft2, Eye, Lock, EyeSlash } from 'iconsax-react-native';
+import { ArrowLeft2, Message } from 'iconsax-react-native';
 import Bio from '@/assets/svg/bio.svg';
 import Button from '@/lib/ui/components/button';
-import { Message } from 'iconsax-react-native';
-import { router } from 'expo-router';
+import PasswordInput from '@/lib/ui/components/passwordInput';
 import { MaterialIcons } from '@expo/vector-icons';
 import BiometricModal from '@/app/(modals)/biometricModal';
 
 const WelcomeBackScreen = () => {
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [password, setPassword] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const isNextButtonDisabled = !phoneNumber || !password;
-  const [isPasswordVisible, setPasswordVisible] = useState(false);
-  const [showPassword, setShowPassword] = useState(true);
-
-  const [phoneNumberIsFocused, setPhoneNumberIsFocused] = useState(false);
-  const [passwordIsFocused, setPasswordIsFocused] = useState(false);
-  useState(false);
+  const isFormValid = Boolean(password);
 
   const text = useThemeColor({}, 'text');
   const green500 = useThemeColor({}, 'green500');
   const gray800 = useThemeColor({}, 'gray800');
-  const vertical = useThemeColor({}, 'vertical');
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
-    setPhoneNumberIsFocused(false);
-  };
-
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!isPasswordVisible);
   };
 
   const toggleBiometricModal = () => {
@@ -51,7 +36,7 @@ const WelcomeBackScreen = () => {
   };
 
   const route = () => {
-    // router.push('(screens)/onboarding/setupTransactionPinScreen');
+    // TODO: wire up authentication once the auth API integration lands
   };
 
   return (
@@ -80,44 +65,11 @@ const WelcomeBackScreen = () => {
               Enter your details to sign in to your account{' '}
             </Text>
             <View className='flex-col justify-between bg-gray-900 px-4 py-3 rounded-2xl'>
-              <View
-                className={`flex-row items-center text-lg rounded-xl p-3 w-full bg-gray-800 my-2 ${
-                  passwordIsFocused ? 'border-green-500' : 'border-gray-600'
-                }`}
-                style={{ borderWidth: 1 }}
-              >
-                <Lock
-                  size='20'
-                  color={green500}
-                  style={{ marginRight: 10 }}
-                />
-                <TextInput
-                  className='flex-1 h-full text-lg'
-                  style={[{}, { color: text }]}
-                  placeholder='Enter Password'
-                  placeholderTextColor={text}
-                  value={password}
-                  onChangeText={(text) => setPassword(text)}
-                  onFocus={() => setPasswordIsFocused(true)}
-                  onBlur={() => setPasswordIsFocused(false)}
-                  secureTextEntry={!isPasswordVisible}
-                />
-                {showPassword ? (
-                  <TouchableOpacity onPress={togglePasswordVisibility}>
-                    <Eye
-                      size='20'
-                      color={green500}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity onPress={togglePasswordVisibility}>
-                    <EyeSlash
-                      size='20'
-                      color={green500}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
+              <PasswordInput
+                placeholder='Enter Password'
+                value={password}
+                onChangeText={setPassword}
+              />
             </View>
 
             <View className='flex flex-row justify-between items-center mt-12 px-4'>
@@ -149,12 +101,11 @@ const WelcomeBackScreen = () => {
             </View>
           </View>
           <View className='mt-4'>
-            {isNextButtonDisabled && (
-              <Button
-                route={route}
-                btnText='Next'
-              />
-            )}
+            <Button
+              route={route}
+              btnText='Next'
+              isDisabled={!isFormValid}
+            />
           </View>
           <View className='mt-4'>
             <Button
@@ -180,7 +131,7 @@ const WelcomeBackScreen = () => {
           <Message color={green500} />
           <Text style={{ color: text }}>Need help?</Text>
           <TouchableOpacity>
-            <Text className='text-green-500'> Contact E-Bills Support </Text>
+            <Text className='text-green-500'> Contact stebills Support </Text>
           </TouchableOpacity>
         </View>
         <BiometricModal

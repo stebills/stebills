@@ -1,4 +1,4 @@
-import { Referral } from '../models/referralModel';
+import Referral from '../models/referral.model';
 import User from '../models/user.model';
 import crypto from 'crypto';
 import UserService from './user.service';
@@ -62,9 +62,3 @@ class ReferralService {
 }
 
 export default ReferralService;
-
-// async function main(userId: string) {
-//   await ReferralService.createReferral(userId, undefined);
-// }
-
-// main('668803b13cb05985191e2e87');
