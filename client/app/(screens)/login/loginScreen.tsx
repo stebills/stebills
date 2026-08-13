@@ -5,26 +5,31 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { ArrowLeft2 } from 'iconsax-react-native';
+import { ArrowLeft2, Sms } from 'iconsax-react-native';
 import Bio from '@/assets/svg/bio.svg';
 import Button from '@/lib/ui/components/button';
+import FormInput from '@/lib/ui/components/formInput';
 import PasswordInput from '@/lib/ui/components/passwordInput';
-import PhoneInput from '@/lib/ui/components/phoneInput';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import BiometricModal from '@/app/(modals)/biometricModal';
+import { login } from '@/lib/api/auth';
+import { hasLocalWallet } from '@/lib/stellar/bootstrap';
 
 const LoginScreen = () => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [password, setPassword] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const isFormValid = Boolean(phoneNumber && password);
+  const isFormValid = Boolean(email && password);
 
   const text = useThemeColor({}, 'text');
   const green500 = useThemeColor({}, 'green500');
@@ -37,8 +42,23 @@ const LoginScreen = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const route = () => {
-    router.push('(screens)/login/welcomeBackScreen');
+  const route = async () => {
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const result = await login(email, password);
+      const walletExists = await hasLocalWallet(result.user._id);
+
+      if (walletExists) {
+        router.replace('(screens)/dashboard/homeScreen');
+      } else {
+        router.replace('(screens)/login/importWalletScreen');
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Could not log you in');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -67,9 +87,18 @@ const LoginScreen = () => {
               Enter your details to sign in to your account{' '}
             </Text>
             <View className='flex-col justify-between bg-gray-900 px-4 py-3 rounded-2xl'>
-              <PhoneInput
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
+              <FormInput
+                icon={
+                  <Sms
+                    size='20'
+                    color={green500}
+                    style={{ marginRight: 10 }}
+                  />
+                }
+                placeholder='Enter your email address'
+                value={email}
+                onChangeText={setEmail}
+                keyboardType='email-address'
               />
 
               <PasswordInput
@@ -78,6 +107,10 @@ const LoginScreen = () => {
                 onChangeText={setPassword}
               />
             </View>
+
+            {error ? (
+              <Text className='text-red-500 mt-2'>{error}</Text>
+            ) : null}
 
             <View className='flex flex-row justify-between items-center mt-12 px-4'>
               <TouchableOpacity
@@ -108,11 +141,15 @@ const LoginScreen = () => {
             </View>
           </View>
           <View className='mt-4'>
-            <Button
-              route={route}
-              btnText='Next'
-              isDisabled={!isFormValid}
-            />
+            {isSubmitting ? (
+              <ActivityIndicator color={green500} />
+            ) : (
+              <Button
+                route={route}
+                btnText='Next'
+                isDisabled={!isFormValid}
+              />
+            )}
           </View>
         </View>
         <View className='absolute bottom-60 left-0 right-0'>

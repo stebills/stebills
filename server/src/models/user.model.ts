@@ -19,6 +19,8 @@ export interface IUser extends Document {
   otpCreationTime?: Date;
   role: string;
   referral: IReferral;
+  googleId?: string;
+  authProvider: 'local' | 'google';
 }
 
 const userSchema: Schema = new Schema(
@@ -26,7 +28,14 @@ const userSchema: Schema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     phone: { type: String, required: true },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: function (this: { authProvider?: string }) {
+        return this.authProvider !== 'google';
+      },
+    },
+    authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
+    googleId: { type: String, unique: true, sparse: true },
     isVerified: { type: Boolean, default: false },
     verificationOTP: { type: Number },
     transactionPin: { type: String },

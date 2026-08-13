@@ -25,6 +25,10 @@ export default function RootLayout() {
           name='welcomeBackScreen'
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name='importWalletScreen'
+          options={{ headerShown: false }}
+        />
       </Stack>
     </ThemeProvider>
   );

@@ -16,12 +16,15 @@ import Bio from '@/assets/svg/bio.svg';
 import OTP from '@/assets/images/otp2.jpeg';
 import { router } from 'expo-router';
 import BiometricModal from '@/app/(modals)/biometricModal';
+import { setTransactionPin } from '@/lib/api/auth';
 
 const SetupTransactionPinScreen = () => {
   const [code, setCode] = useState(['', '', '', '']);
   const [isDisabled, setIsDisabled] = useState(true);
   const [phoneNumberIsFocused, setPhoneNumberIsFocused] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -60,8 +63,17 @@ const SetupTransactionPinScreen = () => {
     Keyboard.dismiss();
   };
 
-  const route = () => {
-    router.push('(screens)/login/loginSreen');
+  const route = async () => {
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await setTransactionPin(code.join(''));
+      router.push('(screens)/onboarding/createWalletScreen');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Could not set your transaction pin');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const toggleBiometricModal = () => {
@@ -132,8 +144,10 @@ const SetupTransactionPinScreen = () => {
           </Text>
         </TouchableOpacity>
 
+        {error ? <Text className='text-red-500 mt-4'>{error}</Text> : null}
+
         <TouchableOpacity
-          disabled={isDisabled}
+          disabled={isDisabled || isSubmitting}
           onPress={route}
           style={[
             {
@@ -152,7 +166,7 @@ const SetupTransactionPinScreen = () => {
               fontWeight: '600',
             }}
           >
-            Next
+            {isSubmitting ? 'Please wait...' : 'Next'}
           </Text>
         </TouchableOpacity>
         <BiometricModal

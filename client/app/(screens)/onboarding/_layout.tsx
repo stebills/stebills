@@ -33,6 +33,18 @@ export default function RootLayout() {
           name='setupTransactionPinScreen'
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name='createWalletScreen'
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='revealSeedPhraseScreen'
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='confirmSeedPhraseScreen'
+          options={{ headerShown: false }}
+        />
       </Stack>
     </ThemeProvider>
   );

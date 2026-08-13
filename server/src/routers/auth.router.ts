@@ -4,6 +4,7 @@ import isAuth from '../middlewares/Authenticate';
 
 const router = express.Router();
 
+router.post('/auth/google', Auth.googleSignIn);
 router.post('/auth/send-otp', Auth.checkIfEmailExistAndSendToken);
 router.post('/auth/resend-otp', Auth.resendOtp);
 router.post('/auth/verify-otp', Auth.verifyOtp);

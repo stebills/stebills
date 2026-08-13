@@ -3,16 +3,21 @@ import {
   Text,
   View,
   Platform,
+  TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import Button from '@/lib/ui/components/button';
 import Logo from '@/lib/ui/components/logo';
+import { useGoogleSignIn } from '@/lib/api/useGoogleSignIn';
+import { hasLocalWallet } from '@/lib/stellar/bootstrap';
 
 function WelcomeScreen() {
   const text = useThemeColor({}, 'text');
   const gray800 = useThemeColor({}, 'gray800');
+  const green500 = useThemeColor({}, 'green500');
 
   const createAccountRoute = () => {
     router.push('(screens)/onboarding/phoneNumberScreen');
@@ -21,6 +26,22 @@ function WelcomeScreen() {
   const loginRoute = () => {
     router.push('(screens)/login/loginScreen');
   };
+
+  const { isReady, isExchanging, error, promptAsync } = useGoogleSignIn(
+    async (result) => {
+      if (result.isNewUser) {
+        router.push('(screens)/onboarding/createWalletScreen');
+        return;
+      }
+
+      const walletExists = await hasLocalWallet(result.user._id);
+      router.push(
+        walletExists
+          ? '(screens)/dashboard/homeScreen'
+          : '(screens)/login/importWalletScreen'
+      );
+    }
+  );
 
   return (
     <SafeAreaView
@@ -55,6 +76,30 @@ function WelcomeScreen() {
             btnText='Login'
           />
         </View>
+        <View className='w-full mb-4'>
+          {isExchanging ? (
+            <ActivityIndicator color={green500} />
+          ) : (
+            <TouchableOpacity
+              disabled={!isReady}
+              onPress={() => promptAsync()}
+              style={{
+                borderWidth: 1,
+                borderColor: green500,
+                borderRadius: 10,
+                paddingVertical: 10,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: green500, fontSize: 16, fontWeight: '600' }}>
+                Continue with Google
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        {error ? (
+          <Text className='text-red-500 text-center mb-2'>{error}</Text>
+        ) : null}
         <Text
           className={`text-base text-center mx-5`}
           style={[{}, { color: text }]}

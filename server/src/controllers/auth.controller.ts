@@ -9,6 +9,12 @@ import bcrypt from 'bcrypt';
 import EmailSender from '../services/mail.service';
 import catchAsync from '../utils/catchAsync';
 import { sendSuccess, sendError } from '../utils/apiResponse';
+import GoogleAuthService from '../services/googleAuth.service';
+import JwtHelper from '../utils/JwtHelper';
+import User from '../models/user.model';
+import Profile from '../models/profile.model';
+import ReferralService from '../services/referral.service';
+import WalletService from '../services/wallet.service';
 
 class Auth {
   static verifyEmail = catchAsync(async (req: Request, res: Response) => {
@@ -109,6 +115,69 @@ class Auth {
     await generateAndSaveOTP(email);
 
     return sendSuccess(res, 200, `email successfully sent to ${email}`);
+  });
+
+  static googleSignIn = catchAsync(async (req: Request, res: Response) => {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return sendError(res, 400, 'Missing field: idToken required');
+    }
+
+    const { googleId, email, name } = await GoogleAuthService.verifyIdToken(idToken);
+
+    let user = await User.findOne({ googleId });
+    let isNewUser = false;
+
+    if (!user) {
+      user = await User.findOne({ email });
+    }
+
+    if (!user) {
+      isNewUser = true;
+      const [firstName, ...rest] = name.split(' ');
+      const lastName = rest.join(' ') || firstName;
+
+      user = await User.create({
+        name,
+        email,
+        phone: '',
+        authProvider: 'google',
+        googleId,
+        isVerified: true,
+        status: 'Active',
+      });
+
+      await Profile.create({
+        user: user._id,
+        phone: '',
+        name,
+        image: `https://ui-avatars.com/api/?uppercase=true&name=${firstName} ${lastName}&background=random&color=random&size=128`,
+      });
+
+      const referral = await ReferralService.createReferral(user._id as string, undefined);
+      const wallet = await WalletService.createWallet(user._id as string, firstName, lastName);
+
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { referral: referral._id, wallet: wallet._id } }
+      );
+    } else if (!user.googleId) {
+      await User.updateOne({ _id: user._id }, { $set: { googleId } });
+    }
+
+    const expiresIn = '30m';
+    const token = JwtHelper.generateToken({ userId: user._id }, expiresIn);
+
+    const authenticatedUser = await User.findById(user._id).select(
+      '-password -transactionPin -__v'
+    );
+
+    return sendSuccess(res, 200, 'Google sign-in successful', {
+      user: authenticatedUser,
+      token,
+      isNewUser,
+    });
   });
 }
 

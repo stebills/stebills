@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,6 +16,7 @@ import FormInput from '@/lib/ui/components/formInput';
 import PasswordInput from '@/lib/ui/components/passwordInput';
 import PhoneInput from '@/lib/ui/components/phoneInput';
 import { router } from 'expo-router';
+import { register } from '@/lib/api/auth';
 
 const SignupScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -23,6 +25,8 @@ const SignupScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const text = useThemeColor({}, 'text');
   const green500 = useThemeColor({}, 'green500');
@@ -31,8 +35,30 @@ const SignupScreen = () => {
     Keyboard.dismiss();
   };
 
-  const route = () => {
-    router.push('(screens)/onboarding/setupTransactionPinScreen');
+  const route = async () => {
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await register({
+        firstName: firstname,
+        lastName: lastname,
+        email,
+        number: phoneNumber,
+        password,
+        confirmPassword,
+      });
+      router.push('(screens)/onboarding/setupTransactionPinScreen');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Could not create your account');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -118,12 +144,19 @@ const SignupScreen = () => {
               />
             </View>
           </View>
+          {error ? (
+            <Text className='text-red-500 mt-4'>{error}</Text>
+          ) : null}
         </View>
         <View>
-          <Button
-            route={route}
-            btnText='Next'
-          />
+          {isSubmitting ? (
+            <ActivityIndicator color={green500} />
+          ) : (
+            <Button
+              route={route}
+              btnText='Next'
+            />
+          )}
         </View>
 
         <View className='flex items-center justify-center mb-10 mt-8'>

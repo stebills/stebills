@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ArrowLeft2, Message } from 'iconsax-react-native';
@@ -15,17 +16,27 @@ import Button from '@/lib/ui/components/button';
 import PasswordInput from '@/lib/ui/components/passwordInput';
 import { MaterialIcons } from '@expo/vector-icons';
 import BiometricModal from '@/app/(modals)/biometricModal';
+import { router } from 'expo-router';
+import { getCurrentUser, login } from '@/lib/api/auth';
+import { hasLocalWallet } from '@/lib/stellar/bootstrap';
 
 const WelcomeBackScreen = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [password, setPassword] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [email, setEmail] = useState<string | null>(null);
 
-  const isFormValid = Boolean(password);
+  const isFormValid = Boolean(password && email);
 
   const text = useThemeColor({}, 'text');
   const green500 = useThemeColor({}, 'green500');
   const gray800 = useThemeColor({}, 'gray800');
+
+  useEffect(() => {
+    getCurrentUser().then((user) => setEmail(user?.email ?? null));
+  }, []);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -35,8 +46,28 @@ const WelcomeBackScreen = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const route = () => {
-    // TODO: wire up authentication once the auth API integration lands
+  const route = async () => {
+    if (!email) {
+      router.replace('(screens)/login/loginScreen');
+      return;
+    }
+
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const result = await login(email, password);
+      const walletExists = await hasLocalWallet(result.user._id);
+
+      router.replace(
+        walletExists
+          ? '(screens)/dashboard/homeScreen'
+          : '(screens)/login/importWalletScreen'
+      );
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Could not log you in');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -72,6 +103,10 @@ const WelcomeBackScreen = () => {
               />
             </View>
 
+            {error ? (
+              <Text className='text-red-500 mt-2'>{error}</Text>
+            ) : null}
+
             <View className='flex flex-row justify-between items-center mt-12 px-4'>
               <TouchableOpacity
                 onPress={() => setIsChecked(!isChecked)}
@@ -101,16 +136,20 @@ const WelcomeBackScreen = () => {
             </View>
           </View>
           <View className='mt-4'>
-            <Button
-              route={route}
-              btnText='Next'
-              isDisabled={!isFormValid}
-            />
+            {isSubmitting ? (
+              <ActivityIndicator color={green500} />
+            ) : (
+              <Button
+                route={route}
+                btnText='Next'
+                isDisabled={!isFormValid}
+              />
+            )}
           </View>
           <View className='mt-4'>
             <Button
               bgColor={gray800}
-              route={route}
+              route={() => router.push('(screens)/onboarding/phoneNumberScreen')}
               btnText='Create an account'
             />
           </View>

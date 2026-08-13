@@ -11,6 +11,7 @@ import authRoute from './routers/auth.router';
 import userRoute from './routers/user.router';
 import profileRoute from './routers/profile.router';
 import uploadRoute from './routers/upload.router';
+import stellarWalletRoute from './routers/stellarWallet.router';
 
 db();
 
@@ -28,6 +29,7 @@ app.use('/api', uploadRoute);
 app.use('/api', authRoute);
 app.use('/api', userRoute);
 app.use('/api', profileRoute);
+app.use('/api', stellarWalletRoute);
 
 app.use('/api/uploads', express.static(path.join(__dirname, '/uploads')));
 
